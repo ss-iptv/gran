@@ -8,11 +8,11 @@ from dotenv import load_dotenv
 
 
 def countdown():
-    print("Starting in:")
+    print("Iniciando processamento em (Aperte ctrl + c para parar):")
     for i in range(5, 0, -1):
         print(f"{i}...")
         time.sleep(1)
-    print("Processing started!")
+    print("Processamento iniciado!")
 
 
 def handle_folders():
@@ -28,8 +28,12 @@ def setAuthCookie():
     cookie_jar.set_cookie(cookie)
 
 
+def encode(value):
+    return urllib.parse.quote(value, safe=" ")
+
+
 def requestFile(download_type, fk, aula_name):
-    fk_encoded = urllib.parse.quote(fk, safe=" ")
+    fk_encoded = encode(fk)
     url = URL_AULAS.replace("DOWNLOAD_TYPE", download_type).replace(
         "FK_ENCODED", fk_encoded
     )
@@ -41,13 +45,13 @@ def requestFile(download_type, fk, aula_name):
         if response.status_code == 200 and len(response.content) > 0:
             return response.content
         else:
-            print(f"Request for {url} returned empty response, retrying...")
+            print(f"Erro em {url}, tentando novamente...")
             time.sleep(1)
             retry_count += 1
 
     with open("errors.txt", "a") as file:
-        file.write(f"\nError downloading {download_type} from {aula_name} in {url}")
-    print(f"Could not download {url} after {retry_limit} retries.")
+        file.write(f"\nErro ao baixar {download_type} de {aula_name} em {url}")
+    print(f"Não foi possível baixar {url} depois de {retry_limit} tentativas.")
     return bytearray()
 
 
@@ -88,7 +92,7 @@ def handle_aulas(aulas, disciplina_name):
             pdfContent = requestFile("resumo", fk_resumo, aula_name)
             saveFile(pdfContent, disciplina_name, aula_name, "resumo")
 
-        print(f"{disciplina_name} - {aula_name} saved!\n")
+        print(f"{disciplina_name} - {aula_name} salvo!\n")
         count = count + 1
 
 
@@ -118,7 +122,7 @@ def main():
     setAuthCookie()
     disciplinas = get_disciplinas()
     handle_disciplinas(disciplinas)
-    print("finished processing!")
+    print("Processamento finalizado!")
 
 
 cookie_jar = CookieJar()

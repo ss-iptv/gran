@@ -1,6 +1,6 @@
 # Automação Grancursos
 
-  Essa aplicação feita em Python faz o download de todos os slides e degravações de cada aula de todas as matérias de um curso.
+  Essa aplicação feita em Python faz o download de todos os slides e degravações de cada aula de todas as matérias de um curso. Todo o conteudo é gerado na pasta "content" e fica separado em pastas com o nome das aulas.
 
 ## Variáveis de ambiente
 
@@ -14,3 +14,8 @@
 Para definir o curso que deseja fazer os downloads, basta entrar em qualquer aula desse curso no site do grancursos e copiar o valor do id do curso da url como mostra a imagem:
 ![Curso](./assets/curso_id.png)
 
+## Execução
+
+- É necessário ter o python instalado no seu computador.
+- No terminal digite: ```pip install -r requeriments.txt``` para instalar as dependências
+- Para iniciar o programa: ```python script.py``` ou ```py script.py```
