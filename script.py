@@ -103,15 +103,7 @@ def handle_aulas(aulas, disciplina_name, conteudo_name):
 def handle_conteudos(conteudos, disciplina_id, disciplina_name):
     for conteudo in conteudos:
         conteudo_id = conteudo["id"]
-        url = (
-            URL_DISCIPLINA.replace("CURSO_ID", CURSO_ID)
-            .replace("DISCIPLINA_ID", disciplina_id)
-            .replace("CONTEUDO_ID", f"{conteudo_id}")
-        )
-
-        response = requests.get(url, cookies=cookie_jar)
-        aulas = response.json()
-
+        aulas = get_aulas(disciplina_id, conteudo_id)
         handle_aulas(aulas, disciplina_name, f"Aula {conteudo_id}")
 
 
@@ -122,6 +114,17 @@ def handle_disciplinas(disciplinas):
 
         conteudos = get_conteudos(disciplina_id)
         handle_conteudos(conteudos, disciplina_id, disciplina_name)
+
+
+def get_aulas(disciplina_id, conteudo_id):
+    url = (
+        URL_DISCIPLINA.replace("CURSO_ID", CURSO_ID)
+        .replace("DISCIPLINA_ID", disciplina_id)
+        .replace("CONTEUDO_ID", f"{conteudo_id}")
+    )
+
+    response = requests.get(url, cookies=cookie_jar)
+    return response.json()
 
 
 def get_conteudos(disciplina_id):
