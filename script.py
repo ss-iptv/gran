@@ -100,31 +100,36 @@ def handle_aulas(aulas, disciplina_name, conteudo_name):
         count_aula += 1
 
 
+def handle_conteudos(conteudos, disciplina_id, disciplina_name):
+    for conteudo in conteudos:
+        conteudo_id = conteudo["id"]
+        url = (
+            URL_DISCIPLINA.replace("CURSO_ID", CURSO_ID)
+            .replace("DISCIPLINA_ID", disciplina_id)
+            .replace("CONTEUDO_ID", f"{conteudo_id}")
+        )
+
+        response = requests.get(url, cookies=cookie_jar)
+        aulas = response.json()
+
+        handle_aulas(aulas, disciplina_name, f"Aula {conteudo_id}")
+
+
 def handle_disciplinas(disciplinas):
     for disciplina in disciplinas:
         disciplina_id = disciplina["id"]
         disciplina_name = disciplina["nome"]
 
-        count_conteudo = 1
-        last_conteudo = False
-        prev_aulas = []
+        conteudos = get_conteudos(disciplina_id)
+        handle_conteudos(conteudos, disciplina_id, disciplina_name)
 
-        while not last_conteudo:
-            url = (
-                URL_DISCIPLINA.replace("CURSO_ID", CURSO_ID)
-                .replace("DISCIPLINA_ID", disciplina_id)
-                .replace("CONTEUDO_ID", f"{count_conteudo}")
-            )
 
-            response = requests.get(url, cookies=cookie_jar)
-            aulas = response.json()
-
-            if not aulas == prev_aulas:
-                handle_aulas(aulas, disciplina_name, f"Aula {count_conteudo}")
-            else:
-                last_conteudo = True
-
-            count_conteudo += 1
+def get_conteudos(disciplina_id):
+    url = URL_CONTEUDO.replace("CURSO_ID", CURSO_ID).replace(
+        "DISCIPLINA_ID", disciplina_id
+    )
+    response = requests.get(url, cookies=cookie_jar)
+    return response.json()
 
 
 def get_disciplinas():
@@ -146,6 +151,7 @@ cookie_jar = CookieJar()
 load_dotenv()
 CURSO_ID = os.getenv("CURSO_ID")
 URL_CURSO = os.getenv("URL_CURSO")
+URL_CONTEUDO = os.getenv("URL_CONTEUDO")
 URL_DISCIPLINA = os.getenv("URL_DISCIPLINA")
 URL_AULAS = os.getenv("URL_AULAS")
 COOKIE_NAME = os.getenv("COOKIE_NAME")
