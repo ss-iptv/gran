@@ -60,15 +60,19 @@ def handle_illegal_characters(value):
     return "".join(c if c not in illegal_chars else "_" for c in value)
 
 
-def saveFile(content, disciplina_name, aula_name, filename):
+def saveFile(content, disciplina_name, aula_name, conteudo_name, filename):
     aula_name = handle_illegal_characters(aula_name)
     disciplina_name = handle_illegal_characters(disciplina_name)
 
     disciplina_path = f"content/{disciplina_name}"
-    aula_path = f"{disciplina_path}/{aula_name}"
+    conteudo_path = f"{disciplina_path}/{conteudo_name}"
+    aula_path = f"{conteudo_path}/{aula_name}"
 
     if not os.path.exists(disciplina_path):
         os.mkdir(disciplina_path)
+
+    if not os.path.exists(conteudo_path):
+        os.mkdir(conteudo_path)
 
     if not os.path.exists(aula_path):
         os.mkdir(aula_path)
@@ -77,23 +81,23 @@ def saveFile(content, disciplina_name, aula_name, filename):
         f.write(content)
 
 
-def handle_aulas(aulas, disciplina_name):
-    count = 1
+def handle_aulas(aulas, disciplina_name, conteudo_name):
+    count_aula = 1
     for aula in aulas:
-        aula_name = f"{count} {aula['st_titulo_novo']}"
+        aula_name = f"{count_aula} {aula['st_titulo_novo']}"
         fk_apostila = aula["fk_apostila"]
         fk_resumo = aula["fk_material_resumo"]
 
         if fk_apostila:
             pdfContent = requestFile("apostila", fk_apostila, aula_name)
-            saveFile(pdfContent, disciplina_name, aula_name, "slide")
+            saveFile(pdfContent, disciplina_name, aula_name, conteudo_name, "slide")
 
         if fk_resumo:
             pdfContent = requestFile("resumo", fk_resumo, aula_name)
-            saveFile(pdfContent, disciplina_name, aula_name, "resumo")
+            saveFile(pdfContent, disciplina_name, aula_name, conteudo_name, "resumo")
 
-        print(f"{disciplina_name} - {aula_name} salvo!\n")
-        count = count + 1
+        print(f"{disciplina_name} - {conteudo_name} - {aula_name} salvo!\n")
+        count_aula += 1
 
 
 def handle_disciplinas(disciplinas):
@@ -101,13 +105,26 @@ def handle_disciplinas(disciplinas):
         disciplina_id = disciplina["id"]
         disciplina_name = disciplina["nome"]
 
-        url = URL_DISCIPLINA.replace("CURSO_ID", CURSO_ID).replace(
-            "DISCIPLINA_ID", disciplina_id
-        )
-        response = requests.get(url, cookies=cookie_jar)
+        count_conteudo = 1
+        last_conteudo = False
+        prev_aulas = []
 
-        aulas = response.json()
-        handle_aulas(aulas, disciplina_name)
+        while not last_conteudo:
+            url = (
+                URL_DISCIPLINA.replace("CURSO_ID", CURSO_ID)
+                .replace("DISCIPLINA_ID", disciplina_id)
+                .replace("CONTEUDO_ID", f"{count_conteudo}")
+            )
+
+            response = requests.get(url, cookies=cookie_jar)
+            aulas = response.json()
+
+            if not aulas == prev_aulas:
+                handle_aulas(aulas, disciplina_name, f"Aula {count_conteudo}")
+            else:
+                last_conteudo = True
+
+            count_conteudo += 1
 
 
 def get_disciplinas():
