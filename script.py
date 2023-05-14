@@ -23,7 +23,7 @@ def handle_folders():
         file.write(f"")
 
 
-def setAuthCookie():
+def set_auth_cookie():
     cookie = requests.cookies.create_cookie(name=COOKIE_NAME, value=COOKIE_VALUE)
     cookie_jar.set_cookie(cookie)
 
@@ -32,7 +32,7 @@ def encode(value):
     return urllib.parse.quote(value, safe=" ")
 
 
-def requestFile(download_type, fk, aula_name):
+def request_file(download_type, fk, aula_name):
     fk_encoded = encode(fk)
     url = URL_AULAS.replace("DOWNLOAD_TYPE", download_type).replace(
         "FK_ENCODED", fk_encoded
@@ -60,7 +60,7 @@ def handle_illegal_characters(value):
     return "".join(c if c not in illegal_chars else "_" for c in value)
 
 
-def saveFile(content, disciplina_name, aula_name, conteudo_name, filename):
+def save_file(content, disciplina_name, aula_name, conteudo_name, filename):
     aula_name = handle_illegal_characters(aula_name)
     disciplina_name = handle_illegal_characters(disciplina_name)
 
@@ -89,12 +89,12 @@ def handle_aulas(aulas, disciplina_name, conteudo_name):
         fk_resumo = aula["fk_material_resumo"]
 
         if fk_apostila:
-            pdfContent = requestFile("apostila", fk_apostila, aula_name)
-            saveFile(pdfContent, disciplina_name, aula_name, conteudo_name, "slide")
+            pdfContent = request_file("apostila", fk_apostila, aula_name)
+            save_file(pdfContent, disciplina_name, aula_name, conteudo_name, "slide")
 
         if fk_resumo:
-            pdfContent = requestFile("resumo", fk_resumo, aula_name)
-            saveFile(pdfContent, disciplina_name, aula_name, conteudo_name, "resumo")
+            pdfContent = request_file("resumo", fk_resumo, aula_name)
+            save_file(pdfContent, disciplina_name, aula_name, conteudo_name, "resumo")
 
         print(f"{disciplina_name} - {conteudo_name} - {aula_name} salvo!\n")
         count_aula += 1
@@ -144,7 +144,7 @@ def get_disciplinas():
 def main():
     countdown()
     handle_folders()
-    setAuthCookie()
+    set_auth_cookie()
     disciplinas = get_disciplinas()
     handle_disciplinas(disciplinas)
     print("Processamento finalizado!")
