@@ -51,11 +51,11 @@ def set_auth_cookie():
 
 
 def handle_folders(apagar):
-    if apagar and os.path.exists("content"):
-        shutil.rmtree("content")
+    if apagar and os.path.exists("grancursos"):
+        shutil.rmtree("grancursos")
 
-    if not os.path.exists("content"):
-        os.mkdir("content")
+    if not os.path.exists("grancursos"):
+        os.mkdir("grancursos")
     with open("errors.txt", "w") as file:
         file.write(f"")
 
@@ -129,7 +129,7 @@ def process_disciplinas_pdf():
 
 
 def handle_disciplinas(disciplinas, path, callback_aulas, base_url):
-    new_prefix = create_folder("content/", path)
+    new_prefix = create_folder("grancursos/", path)
 
     for disciplina in disciplinas:
         disciplina_id = disciplina["id"]
