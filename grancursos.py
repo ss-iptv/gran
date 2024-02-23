@@ -173,15 +173,15 @@ def handle_aulas(prefix, aulas):
         
 #def handle_aulas(prefix, aulas):
 #    count = 1
- #   for aula in aulas:
-  #      fk_apostila = aula["fk_apostila"]
-   #     fk_resumo = aula["fk_material_resumo"]
-   #     aula_name = f"{count} {aula['st_titulo_novo']}"
-    #    count += 1
-     #   new_prefix = create_folder(prefix, aula_name)
-      #  handle_slide_or_resumo(fk_apostila, new_prefix, "slide")
-      #  handle_slide_or_resumo(fk_resumo, new_prefix, "resumo")
-       # print("\n\n")
+#   for aula in aulas:
+#      fk_apostila = aula["fk_apostila"]
+#     fk_resumo = aula["fk_material_resumo"]
+#     aula_name = f"{count} {aula['st_titulo_novo']}"
+#    count += 1
+#   new_prefix = create_folder(prefix, aula_name)
+#  handle_slide_or_resumo(fk_apostila, new_prefix, "slide")
+#  handle_slide_or_resumo(fk_resumo, new_prefix, "resumo")
+# print("\n\n")
 
 
 def handle_slide_or_resumo(fk, path, type_name):
