@@ -164,7 +164,7 @@ def handle_aulas(prefix, aulas):
         fk_resumo = aula["fk_material_resumo"]
         aula_name = f"{count} {aula['st_titulo_novo']}"
         # Truncar aula_name para 100 caracteres
-        aula_name = aula_name[:100]
+        #aula_name = aula_name[:100]
         count += 1
         new_prefix = create_folder(prefix, aula_name)
         handle_slide_or_resumo(fk_apostila, new_prefix, "slide")
