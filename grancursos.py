@@ -248,10 +248,13 @@ def create_folder(prefix, path):
         os.mkdir(path)
     return path + "/"
 
-
 def handle_illegal_characters(value):
-    illegal_chars = ["<", ">", ":", '"', "/", "\\", "|", "?", "*"]
-    return "".join(c if c not in illegal_chars else " " for c in value)
+    illegal_chars = ["<", ">", ":", '"', "/", "\\", "|", "?", "*", "\0", ".", "-", "\t", "\n", "\r"]
+    return "".join(c if c not in illegal_chars else "_" for c in value)
+
+#def handle_illegal_characters(value):
+ #   illegal_chars = ["<", ">", ":", '"', "/", "\\", "|", "?", "*"]
+  #  return "".join(c if c not in illegal_chars else " " for c in value)
 
 
 def encode(value):
