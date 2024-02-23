@@ -189,4 +189,12 @@ def create_folder(prefix, path):
     return path + "/"
 
 def handle_illegal_characters(value):
-    return "".join(c if
+    return "".join(c if c not in illegal_chars else " " for c in value)
+
+
+def encode(value):
+    return urllib.parse.quote(value, safe=" ")
+
+
+if __name__ == "__main__":
+    main()
