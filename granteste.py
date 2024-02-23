@@ -6,37 +6,63 @@ import urllib.parse
 import shutil
 from dotenv import load_dotenv
 
-# Load environment variables
+
 load_dotenv()
 cookie_jar = CookieJar()
 
-# Define constants
 CURSO_ID = os.getenv("CURSO_ID")
 BASE_URL = os.getenv("BASE_URL")
 DISCIPLINAS_URL = BASE_URL + os.getenv("DISCIPLINAS_URL").replace("CURSO_ID", CURSO_ID)
 CONTEUDOS_URL = DISCIPLINAS_URL + os.getenv("CONTEUDOS_URL")
 DOWNLOAD_AULA_URL = BASE_URL + os.getenv("DOWNLOAD_AULA_URL")
-DISCIPLINAS_PDF_URL = BASE_URL + os.getenv("DISCIPLINAS_PDF_URL").replace("CURSO_ID", CURSO_ID)
+DISCIPLINAS_PDF_URL = BASE_URL + os.getenv("DISCIPLINAS_PDF_URL").replace(
+    "CURSO_ID", CURSO_ID
+)
 CONTEUDOS_PDF_URL = DISCIPLINAS_PDF_URL + os.getenv("CONTEUDOS_PDF_URL")
 DOWNLOAD_AULA_PDF_URL = BASE_URL + os.getenv("DOWNLOAD_AULA_PDF_URL")
 AUTH_COOKIE_NAME = os.getenv("AUTH_COOKIE_NAME")
 AUTH_COOKIE_VALUE = os.getenv("AUTH_COOKIE_VALUE")
-ILLEGAL_CHARS = ["<", ">", ":", '"', "/", "\\", "|", "?", "*", "\0", ".", "-", "\t", "\n", "\r"]
 
-# Define functions
+
+def main():
+    if not CURSO_ID or not AUTH_COOKIE_VALUE:
+        print("Preencha corretamente as variáveis de ambiente! (.env)")
+        return
+
+    operacao, apagar = draw_menu()
+    countdown()
+    handle_folders(apagar == 1)
+    set_auth_cookie()
+
+    if not operacao == 2:
+        process_disciplinas_pdf()
+
+    if not operacao == 1:
+        process_disciplinas()
+
+    print("\n\nProcessamento Finalizado!")
+
+
 def set_auth_cookie():
-    cookie = requests.cookies.create_cookie(name=AUTH_COOKIE_NAME, value=AUTH_COOKIE_VALUE)
+    cookie = requests.cookies.create_cookie(
+        name=AUTH_COOKIE_NAME, value=AUTH_COOKIE_VALUE
+    )
     cookie_jar.set_cookie(cookie)
+
 
 def handle_folders(apagar):
     if apagar and os.path.exists("grancursos"):
         shutil.rmtree("grancursos")
-    os.makedirs("grancursos", exist_ok=True)
+
+    if not os.path.exists("grancursos"):
+        os.mkdir("grancursos")
     with open("errors.txt", "w") as file:
         file.write(f"")
 
+
 def clear_terminal():
     os.system("cls" if os.name == "nt" else "clear")
+
 
 def draw_menu():
     clear_terminal()
@@ -77,6 +103,7 @@ def draw_menu():
 
     return int(operacao), int(apagar)
 
+
 def countdown():
     print("Iniciando processamento em (Aperte ctrl + c para parar):")
     for i in range(5, 0, -1):
@@ -84,18 +111,27 @@ def countdown():
         time.sleep(1)
     print("Processamento iniciado!")
 
+
 def process_disciplinas():
     print("\nIniciando download dos slides e degravações.")
     disciplinas = request_json(DISCIPLINAS_URL)
     handle_disciplinas(disciplinas, "Slides e Degravações", handle_aulas, CONTEUDOS_URL)
     print("Download dos slides e degravações concluído.")
 
+
 def process_disciplinas_pdf():
     print("\nIniciando download das aulas em pdf.")
     disciplinas_pdf = request_json(DISCIPLINAS_PDF_URL)
-    handle_disciplinas(disciplinas_pdf, "Aulas em PDF", handle_aulas_pdf, CONTEUDOS_PDF_URL)
+    handle_disciplinas(
+        disciplinas_pdf, "Aulas em PDF", handle_aulas_pdf, CONTEUDOS_PDF_URL
+    )
     print("Download das aulas em pdf concluído.")
 
+
+#def handle_disciplinas(disciplinas, path, callback_aulas, base_url):
+#    folder_name = input("Digite o nome da nova pasta: ")
+#    new_prefix = create_folder(f"grancursos/{folder_name}/", path)
+    
 def handle_disciplinas(disciplinas, path, callback_aulas, base_url):
     new_prefix = create_folder("grancursos/", path)
 
@@ -109,6 +145,7 @@ def handle_disciplinas(disciplinas, path, callback_aulas, base_url):
         if conteudos:
             handle_conteudos(url, new_prefix_disciplina, conteudos, callback_aulas)
 
+
 def handle_conteudos(url, prefix, conteudos, callback_aulas):
     count = 1
     for conteudo in conteudos:
@@ -119,17 +156,33 @@ def handle_conteudos(url, prefix, conteudos, callback_aulas):
         if aulas:
             callback_aulas(new_prefix, aulas)
 
+
 def handle_aulas(prefix, aulas):
     count = 1
     for aula in aulas:
         fk_apostila = aula["fk_apostila"]
         fk_resumo = aula["fk_material_resumo"]
         aula_name = f"{count} {aula['st_titulo_novo']}"
+        # Truncar aula_name para 100 caracteres
+        #aula_name = aula_name[:100]
         count += 1
         new_prefix = create_folder(prefix, aula_name)
         handle_slide_or_resumo(fk_apostila, new_prefix, "slide")
         handle_slide_or_resumo(fk_resumo, new_prefix, "resumo")
         print("\n\n")
+        
+#def handle_aulas(prefix, aulas):
+#    count = 1
+#   for aula in aulas:
+#      fk_apostila = aula["fk_apostila"]
+#     fk_resumo = aula["fk_material_resumo"]
+#     aula_name = f"{count} {aula['st_titulo_novo']}"
+#    count += 1
+#   new_prefix = create_folder(prefix, aula_name)
+#  handle_slide_or_resumo(fk_apostila, new_prefix, "slide")
+#  handle_slide_or_resumo(fk_resumo, new_prefix, "resumo")
+# print("\n\n")
+
 
 def handle_slide_or_resumo(fk, path, type_name):
     if fk and not pdf_exists(path, type_name):
@@ -139,6 +192,7 @@ def handle_slide_or_resumo(fk, path, type_name):
         print(f"{path}{type_name}.pdf salvo!")
     else:
         print(f"{path}{type_name}.pdf já existe!")
+
 
 def handle_aulas_pdf(prefix, aulas_pdf):
     count = 1
@@ -156,9 +210,11 @@ def handle_aulas_pdf(prefix, aulas_pdf):
         save_pdf(pdf, prefix, aula_pdf_name)
         print(f"{prefix}{aula_pdf_name} - salvo!\n\n")
 
+
 def pdf_exists(path, filename):
     filename = handle_illegal_characters(filename)
     return os.path.exists(path + filename + ".pdf")
+
 
 def request_json(url):
     try:
@@ -169,6 +225,7 @@ def request_json(url):
             file.write(f"{url} - {e}\n")
         return []
 
+
 def request_pdf(url):
     try:
         response = requests.get(url, cookies=cookie_jar)
@@ -178,23 +235,58 @@ def request_pdf(url):
             file.write(f"{url} - {e}\n")
         return bytearray
 
+
 def save_pdf(pdf, path, filename):
     filename = handle_illegal_characters(filename)
     with open(os.path.join(path, filename + ".pdf"), "wb") as f:
         f.write(pdf)
 
+
 def create_folder(prefix, path):
     path = prefix + handle_illegal_characters(path)
-    os.makedirs(path, exist_ok=True)
+    if not os.path.exists(path):
+        os.mkdir(path)
     return path + "/"
 
 def handle_illegal_characters(value):
+    illegal_chars = ["<", ">", ":", '"', "/", "\\", "|", "?", "*", "\0", ".", "-", "\t", "\n", "\r"]
     return "".join(c if c not in illegal_chars else " " for c in value)
+
+#def handle_illegal_characters(value):
+ #   illegal_chars = ["<", ">", ":", '"', "/", "\\", "|", "?", "*"]
+  #  return "".join(c if c not in illegal_chars else " " for c in value)
 
 
 def encode(value):
     return urllib.parse.quote(value, safe=" ")
 
+
+def download_video(fk, path, type_name):
+    if fk and not video_exists(path, type_name):
+        url = DOWNLOAD_AULA_URL.replace("TYPE", type_name).replace("FK", encode(fk))
+        video_content = request_video(url)
+        save_video(video_content, path, type_name)
+        print(f"{path}{type_name}.mp4 salvo!")
+    else:
+        print(f"{path}{type_name}.mp4 já existe!")
+
+def video_exists(path, filename):
+    filename = handle_illegal_characters(filename)
+    return os.path.exists(path + filename + ".mp4")
+
+def request_video(url):
+    try:
+        response = requests.get(url, cookies=cookie_jar, stream=True)
+        return response.content
+    except Exception as e:
+        with open("errors.txt", "a") as file:
+            file.write(f"{url} - {e}\n")
+        return bytearray
+
+def save_video(video, path, filename):
+    filename = handle_illegal_characters(filename)
+    with open(os.path.join(path, filename + ".mp4"), "wb") as f:
+        f.write(video)
 
 if __name__ == "__main__":
     main()
