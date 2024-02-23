@@ -72,12 +72,13 @@ def draw_menu():
     print("|  1. Download das aulas em PDF          |")
     print("|  2. Download de slides e degravações   |")
     print("|  3. Download de ambos                  |")
+    print("|  4. Download do video                  |")
     print("|                                        |")
     print("|========================================|")
 
     while True:
         operacao = input("")
-        if operacao in (1, 2, 3, "1", "2", "3"):
+        if operacao in (1, 2, 3, 4, "1", "2", "3", "4"):
             break
         else:
             print("Opção inválida. Por favor, escolha uma opção válida.")
