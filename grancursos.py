@@ -128,12 +128,12 @@ def process_disciplinas_pdf():
     print("Download das aulas em pdf concluído.")
 
 
-def handle_disciplinas(disciplinas, path, callback_aulas, base_url):
-    folder_name = input("Digite o nome da nova pasta: ")
-    new_prefix = create_folder(f"grancursos/{folder_name}/", path)
+#def handle_disciplinas(disciplinas, path, callback_aulas, base_url):
+#    folder_name = input("Digite o nome da nova pasta: ")
+#    new_prefix = create_folder(f"grancursos/{folder_name}/", path)
     
-    #def handle_disciplinas(disciplinas, path, callback_aulas, base_url):
-#    new_prefix = create_folder("grancursos/", path)
+def handle_disciplinas(disciplinas, path, callback_aulas, base_url):
+    new_prefix = create_folder("grancursos/", path)
 
     for disciplina in disciplinas:
         disciplina_id = disciplina["id"]
